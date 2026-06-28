@@ -259,21 +259,21 @@ export function estimate(input: EstimateInput): EstimateResult {
       }
     }
 
-    // 信函·水陆（27 路向特例 / 否则统一价）
+    // 信函·水陆（27 路向特价 / 否则统一价）
     {
-      const jp = lookupGroup("letter_surface_special", destination) === "jp_special";
-      const rate = letterRate("letter", "surface", jp ? "jp_special" : "flat");
+      const special = lookupGroup("letter_surface_special", destination) === "jp_special";
+      const rate = letterRate("letter", "surface", special ? "jp_special" : "flat");
       if (rate) {
         const { total, pieces } = costProgressive(rate, w);
         const n = [
-          jp ? "水陆路信函特例，小批量最省" : "水陆路信函统一价",
+          special ? "水陆路信函·27路向特价，小批量最省" : "水陆路信函统一价",
           "通常无追踪（可加挂号16/件）",
           "单件上限2kg",
         ];
         if (pieces > 1) n.push(`超2kg拆 ${pieces} 件，每件重付首重`);
         add(
           "letter_surface",
-          jp ? "平信·水陆(日本特例)" : "平信·水陆",
+          special ? "平信·水陆(27路向特价)" : "平信·水陆",
           total,
           {
             feasible: true,
