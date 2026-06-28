@@ -93,14 +93,66 @@ describe("estimate 寄日本", () => {
 });
 
 describe("estimate 港澳台", () => {
-  it("香港 100 张：含港澳台印刷品/包裹方式，不应出现 M-bag 航空/SAL/水陆 flat", () => {
+  it("香港 100×5g：港澳台 6 大类(信函/印刷品/M-bag × 水陆/航空) + 包裹2", () => {
     const res = estimate({ destination: "香港", cardCount: 100, cardWeightG: 5 });
     const methods = res.options.map((o) => o.method);
-    expect(methods).toContain("printed_hktw");
-    expect(methods).toContain("mbag_hktw");
+    // 港澳台特有的 6 类信函/印刷品/M-bag
+    expect(methods).toContain("letter_hktw_surface");
+    expect(methods).toContain("letter_hktw_air");
+    expect(methods).toContain("printed_hktw_surface");
+    expect(methods).toContain("printed_hktw_air");
+    expect(methods).toContain("mbag_hktw_surface");
+    expect(methods).toContain("mbag_hktw_air");
+    // 不应出现国际方式
     expect(methods.some((m) => m === "mbag_air" || m === "mbag_sal" || m === "mbag_surface")).toBe(false);
-    // 港澳台包裹也只有 hktw_air / hktw_surface
+    expect(methods.some((m) => m === "letter_air" || m === "letter_surface")).toBe(false);
+    // 港澳台包裹有 hktw_air / hktw_surface
     expect(methods.some((m) => m === "parcel_hktw_air" || m === "parcel_hktw_surface")).toBe(true);
+  });
+
+  it("台湾 1 张(20g)：平信水陆 ¥1.50，平信航空 +2*0.5 = ¥2.50", () => {
+    const res = estimate({ destination: "台湾", cardCount: 1, cardWeightG: 20 });
+    const sf = res.options.find((o) => o.method === "letter_hktw_surface")!;
+    const air = res.options.find((o) => o.method === "letter_hktw_air")!;
+    expect(sf.base_cost).toBe(1.5);
+    expect(air.base_cost).toBe(2.5);
+  });
+
+  it("台湾 100×20g(=2000g, 落在阶梯最大档)：水陆 ¥55.80，航空 ¥55.80+200×0.5=¥155.80", () => {
+    const res = estimate({ destination: "台湾", cardCount: 100, cardWeightG: 20 });
+    const sf = res.options.find((o) => o.method === "letter_hktw_surface")!;
+    const air = res.options.find((o) => o.method === "letter_hktw_air")!;
+    expect(sf.base_cost).toBe(55.8);
+    expect(air.base_cost).toBe(155.8);
+    expect(sf.pieces).toBe(1);
+  });
+
+  it("香港 25 张(500g)：阶梯 500g 档 = ¥16.70 水陆", () => {
+    const res = estimate({ destination: "香港", cardCount: 25, cardWeightG: 20 });
+    const sf = res.options.find((o) => o.method === "letter_hktw_surface")!;
+    expect(sf.base_cost).toBe(16.7);
+  });
+
+  it("澳门 300×20g(=6000g, 超 2kg 上限拆 3 件)：水陆 = 3×55.80 = ¥167.40", () => {
+    const res = estimate({ destination: "澳门", cardCount: 300, cardWeightG: 20 });
+    const sf = res.options.find((o) => o.method === "letter_hktw_surface")!;
+    expect(sf.pieces).toBe(3);
+    expect(sf.base_cost).toBe(167.4);
+  });
+
+  it("台湾印刷品·水陆 vs 航空 (100×20g=2000g)：差额 = 200×0.5 = ¥100", () => {
+    const res = estimate({ destination: "台湾", cardCount: 100, cardWeightG: 20 });
+    const sf = res.options.find((o) => o.method === "printed_hktw_surface")!;
+    const air = res.options.find((o) => o.method === "printed_hktw_air")!;
+    expect(air.base_cost - sf.base_cost).toBeCloseTo(100, 1);
+  });
+
+  it("M-bag·港澳台·水陆 5kg = ¥180；航空 = ¥180 + 500×0.5 = ¥430", () => {
+    const res = estimate({ destination: "香港", cardCount: 1000, cardWeightG: 5 });
+    const sf = res.options.find((o) => o.method === "mbag_hktw_surface")!;
+    const air = res.options.find((o) => o.method === "mbag_hktw_air")!;
+    expect(sf.base_cost).toBe(180);
+    expect(air.base_cost).toBe(430);
   });
 });
 

@@ -107,13 +107,68 @@
     {
       "category": "printed",
       "service": "hktw",
-      "grp": "hktw",
+      "grp": "surface",
       "first_weight_g": 20,
       "first_price": 3.5,
       "add_unit_g": 10,
       "add_price": 1.3,
       "max_weight_g": 5000,
-      "note": "港澳台印刷品，不分组"
+      "note": "港澳台印刷品·水陆基本资费（不分组）。来源：台湾、香港和澳门地区函件资费表"
+    },
+    {
+      "category": "printed",
+      "service": "hktw",
+      "grp": "air",
+      "first_weight_g": 20,
+      "first_price": 3.5,
+      "add_unit_g": 10,
+      "add_price": 1.3,
+      "air_surcharge_unit_g": 10,
+      "air_surcharge_price": 0.5,
+      "max_weight_g": 5000,
+      "note": "港澳台印刷品·航空 = 水陆基本资费 + 航空费(每10g或零数 ¥0.50)"
+    },
+    {
+      "category": "letter",
+      "service": "hktw",
+      "grp": "surface",
+      "first_weight_g": 0,
+      "first_price": 0,
+      "add_unit_g": 0,
+      "add_price": 0,
+      "brackets": [
+        {"max_weight_g": 20, "price": 1.5},
+        {"max_weight_g": 50, "price": 2.8},
+        {"max_weight_g": 100, "price": 4.0},
+        {"max_weight_g": 250, "price": 8.5},
+        {"max_weight_g": 500, "price": 16.7},
+        {"max_weight_g": 1000, "price": 31.7},
+        {"max_weight_g": 2000, "price": 55.8}
+      ],
+      "max_weight_g": 2000,
+      "note": "港澳台信函·水陆基本资费（阶梯计费）。来源：台湾、香港和澳门地区函件资费表"
+    },
+    {
+      "category": "letter",
+      "service": "hktw",
+      "grp": "air",
+      "first_weight_g": 0,
+      "first_price": 0,
+      "add_unit_g": 0,
+      "add_price": 0,
+      "brackets": [
+        {"max_weight_g": 20, "price": 1.5},
+        {"max_weight_g": 50, "price": 2.8},
+        {"max_weight_g": 100, "price": 4.0},
+        {"max_weight_g": 250, "price": 8.5},
+        {"max_weight_g": 500, "price": 16.7},
+        {"max_weight_g": 1000, "price": 31.7},
+        {"max_weight_g": 2000, "price": 55.8}
+      ],
+      "air_surcharge_unit_g": 10,
+      "air_surcharge_price": 0.5,
+      "max_weight_g": 2000,
+      "note": "港澳台信函·航空 = 水陆阶梯 + 航空费(每10g或零数 ¥0.50)"
     },
     {
       "category": "mbag",
@@ -189,13 +244,26 @@
     {
       "category": "mbag",
       "service": "hktw",
-      "grp": "hktw",
+      "grp": "surface",
       "first_weight_g": 5000,
       "first_price": 180.0,
       "add_unit_g": 1000,
       "add_price": 45.0,
       "max_weight_g": 20000,
-      "note": "港澳台，不分组"
+      "note": "港澳台印刷品专袋·水陆基本资费（不分组）"
+    },
+    {
+      "category": "mbag",
+      "service": "hktw",
+      "grp": "air",
+      "first_weight_g": 5000,
+      "first_price": 180.0,
+      "add_unit_g": 1000,
+      "add_price": 45.0,
+      "air_surcharge_unit_g": 10,
+      "air_surcharge_price": 0.5,
+      "max_weight_g": 20000,
+      "note": "港澳台印刷品专袋·航空 = 水陆基本资费 + 航空费(每10g或零数 ¥0.50)"
     }
   ],
   "surcharges": [

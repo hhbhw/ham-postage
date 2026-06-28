@@ -8,14 +8,28 @@ export type Service =
 
 export type Category = "letter" | "printed" | "mbag";
 
+export interface LetterBracket {
+  /** 该档位的重量上限（含），单位 g */
+  max_weight_g: number;
+  /** 该档位单件资费 */
+  price: number;
+}
+
 export interface LetterRate {
   category: Category;
   service: "air" | "surface" | "sal" | "hktw";
   grp: string;
+  /** 累进模型用 —— 阶梯模型可填 0 */
   first_weight_g: number;
   first_price: number;
   add_unit_g: number;
   add_price: number;
+  /** 阶梯模型 —— 港澳台信函专用：按重量分档查价。存在时优先于累进字段。 */
+  brackets?: LetterBracket[];
+  /** 航空附加费 —— 在 brackets 或累进基础上叠加（港澳台航空寄）。单位 g + 单价。 */
+  air_surcharge_unit_g?: number;
+  air_surcharge_price?: number;
+  /** 单件重量上限（拆件时用） */
   max_weight_g: number;
   note?: string;
 }
