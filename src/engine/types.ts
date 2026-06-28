@@ -1,0 +1,72 @@
+export type Service =
+  | "air"
+  | "surface"
+  | "sal"
+  | "hktw"
+  | "hktw_air"
+  | "hktw_surface";
+
+export type Category = "letter" | "printed" | "mbag";
+
+export interface LetterRate {
+  category: Category;
+  service: "air" | "surface" | "sal" | "hktw";
+  grp: string;
+  first_weight_g: number;
+  first_price: number;
+  add_unit_g: number;
+  add_price: number;
+  max_weight_g: number;
+  note?: string;
+}
+
+export interface ParcelRate {
+  service: "air" | "surface" | "sal" | "hktw_air" | "hktw_surface";
+  destination: string;
+  first_kg_price: number;
+  add_kg_price: number;
+  max_weight_kg: number | null;
+  size_class: string;
+}
+
+export interface Surcharge {
+  code: string;
+  label: string;
+  unit: string;
+  price: number;
+}
+
+export interface PostageSeed {
+  letter_rates: LetterRate[];
+  surcharges: Surcharge[];
+  dest_groups: {
+    printed_air: Record<string, string[]>;
+    letter_surface_special: Record<string, string[]>;
+    letter_air: Record<string, string[]>;
+  };
+  mbag_20kg_capped: string[];
+}
+
+export interface EstimateOption {
+  method: string;
+  label: string;
+  base_cost: number;
+  cost_with_tracking: number;
+  cost: number;
+  pieces: number;
+  weight_g: number;
+  feasible: boolean;
+  has_tracking: boolean;
+  notes: string[];
+  flags: string[];
+}
+
+export interface EstimateResult {
+  destination: string;
+  card_count: number;
+  weight_g: number;
+  tracking_required: boolean;
+  recommended: { method: string; label: string; cost: number } | null;
+  options: EstimateOption[];
+  notes: string[];
+}

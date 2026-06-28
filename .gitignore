@@ -1,0 +1,7 @@
+node_modules
+dist
+.DS_Store
+*.local
+.vite
+src/data/parcel_rates.json
+src/data/destination_pinyin.json
