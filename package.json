@@ -11,6 +11,7 @@
     "gen:data": "node scripts/csv-to-json.mjs && node scripts/gen-pinyin.mjs",
     "prebuild": "npm run gen:data",
     "predev": "npm run gen:data",
+    "pretest": "npm run gen:data",
     "test": "vitest run",
     "test:watch": "vitest"
   },
