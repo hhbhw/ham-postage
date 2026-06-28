@@ -276,13 +276,33 @@ button {
 
 .weight-tweak {
   display: flex;
-  gap: 0.75rem;
-  align-items: center;
+  flex-direction: column;
+  gap: 0.5rem;
   margin-top: 0.5rem;
+}
+
+.weight-tweak label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.weight-tweak .tweak-label {
+  min-width: 3.75rem;
+  font-size: 0.85rem;
+  color: var(--text-dim);
 }
 
 .weight-tweak input[type="range"] {
   flex: 1;
+  min-width: 0;
+}
+
+.weight-tweak .tweak-val {
+  min-width: 2.5rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.85rem;
 }
 
 .link {

@@ -1,7 +1,11 @@
 import { useEffect, useMemo, useState } from "preact/hooks";
 import { DestinationPicker } from "./components/DestinationPicker";
 import { ResultView } from "./components/ResultView";
-import { DEFAULT_CARD_WEIGHT_G, estimate } from "./engine/postage";
+import {
+  DEFAULT_CARD_WEIGHT_G,
+  DEFAULT_ENVELOPE_WEIGHT_G,
+  estimate,
+} from "./engine/postage";
 
 const QUICK_PICKS = [
   "日本",
@@ -36,13 +40,16 @@ function loadHistory(): HistoryItem[] {
 
 export function App() {
   const [destination, setDestination] = useState("");
-  const [cardCount, setCardCount] = useState(100);
+  const [cardCount, setCardCount] = useState(1);
   const [trackingRequired, setTrackingRequired] = useState(false);
   const [cardWeightG, setCardWeightG] = useState(DEFAULT_CARD_WEIGHT_G);
+  const [envelopeWeightG, setEnvelopeWeightG] = useState(
+    DEFAULT_ENVELOPE_WEIGHT_G,
+  );
   const [showWeightTweak, setShowWeightTweak] = useState(false);
   const [history, setHistory] = useState<HistoryItem[]>(() => loadHistory());
 
-  const weightG = cardCount * cardWeightG;
+  const weightG = envelopeWeightG + cardCount * cardWeightG;
 
   const result = useMemo(() => {
     if (!destination || cardCount <= 0) return null;
@@ -51,8 +58,9 @@ export function App() {
       cardCount,
       trackingRequired,
       cardWeightG,
+      envelopeWeightG,
     });
-  }, [destination, cardCount, trackingRequired, cardWeightG]);
+  }, [destination, cardCount, trackingRequired, cardWeightG, envelopeWeightG]);
 
   // 写入历史：destination 变更且有结果时（防抖：换目的地后保存）
   useEffect(() => {
@@ -141,28 +149,48 @@ export function App() {
         </div>
         <small class="weight-hint">
           ≈ <strong>{weightG.toLocaleString()}g</strong>
+          {" "}（信封 {envelopeWeightG}g + 卡片 {cardWeightG}g×{cardCount}）
           {" · "}
           <button
             type="button"
             class="link"
             onClick={() => setShowWeightTweak((v) => !v)}
           >
-            每张 {cardWeightG}g {showWeightTweak ? "收起" : "调整"}
+            {showWeightTweak ? "收起" : "调整"}
           </button>
         </small>
         {showWeightTweak && (
           <div class="weight-tweak">
-            <input
-              type="range"
-              min={5}
-              max={40}
-              step={1}
-              value={cardWeightG}
-              onInput={(e) =>
-                setCardWeightG(Number((e.target as HTMLInputElement).value))
-              }
-            />
-            <span>{cardWeightG} g/张</span>
+            <label>
+              <span class="tweak-label">信封</span>
+              <input
+                type="range"
+                min={0}
+                max={30}
+                step={1}
+                value={envelopeWeightG}
+                onInput={(e) =>
+                  setEnvelopeWeightG(
+                    Number((e.target as HTMLInputElement).value),
+                  )
+                }
+              />
+              <span class="tweak-val">{envelopeWeightG}g</span>
+            </label>
+            <label>
+              <span class="tweak-label">每张卡</span>
+              <input
+                type="range"
+                min={1}
+                max={20}
+                step={1}
+                value={cardWeightG}
+                onInput={(e) =>
+                  setCardWeightG(Number((e.target as HTMLInputElement).value))
+                }
+              />
+              <span class="tweak-val">{cardWeightG}g</span>
+            </label>
           </div>
         )}
       </section>
@@ -224,7 +252,7 @@ export function App() {
         </a>
         <p class="disclaimer">
           数据为本地内置，仅供参考；以邮局实际收寄为准。<br />
-          单张卡按 {cardWeightG}g 估重，可在上方调整。
+          重量按「信封 {envelopeWeightG}g + 卡 {cardWeightG}g/张」估算，可在上方调整。
         </p>
       </footer>
     </main>

@@ -15,8 +15,9 @@ import type {
 
 const HKTW = new Set(["香港", "澳门", "台湾"]);
 
-// 1 张卡 + 信封 ≈ 20g（用户偏好默认）。多张共用信封时可在 UI 调小。
-export const DEFAULT_CARD_WEIGHT_G = 20;
+// 信封 10g（1 个）+ 卡片 5g/张。多张共用一个信封。
+export const DEFAULT_CARD_WEIGHT_G = 5;
+export const DEFAULT_ENVELOPE_WEIGHT_G = 10;
 
 function bracketPrice(rate: LetterRate, weightG: number): number {
   // brackets 已按 max_weight_g 升序写入；不在任何档位内则按最大档收（实际拆件机制会保证不到这一步）
@@ -85,12 +86,15 @@ export interface EstimateInput {
   cardCount: number;
   trackingRequired?: boolean;
   cardWeightG?: number;
+  envelopeWeightG?: number;
 }
 
 export function estimate(input: EstimateInput): EstimateResult {
   const { destination, cardCount, trackingRequired = false } = input;
   const cardWeightG = input.cardWeightG ?? DEFAULT_CARD_WEIGHT_G;
-  const w = cardCount * cardWeightG;
+  // 默认 0 —— 老测试用例(裸卡片 5g)不传信封；UI 端传 10g
+  const envelopeWeightG = input.envelopeWeightG ?? 0;
+  const w = envelopeWeightG + cardCount * cardWeightG;
   const isHktw = HKTW.has(destination);
   const reg = surcharge("registration");
   const mbagReg = surcharge("mbag_registration");
