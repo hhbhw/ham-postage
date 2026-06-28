@@ -3,6 +3,8 @@ import preact from "@preact/preset-vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
+  // 相对路径 → 同份产物在任意子路径下都跑得动（GitHub Pages /ham-postage/，根目录，自建子路径）。
+  base: "./",
   plugins: [
     preact(),
     VitePWA({
