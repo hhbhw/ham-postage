@@ -28,7 +28,9 @@ function bracketPrice(rate: LetterRate, weightG: number): number {
 }
 
 function progressivePiece(rate: LetterRate, weightG: number): number {
-  const extra = Math.max(0, weightG - rate.first_weight_g);
+  // 最低计费重量 —— 国际印刷品 1kg 起算，不到 1kg 按 1kg 计；M-bag 用 first_weight_g 起算自有逻辑。
+  const billable = Math.max(rate.min_billable_g ?? 0, weightG);
+  const extra = Math.max(0, billable - rate.first_weight_g);
   const steps = extra > 0 ? Math.ceil(extra / rate.add_unit_g) : 0;
   return rate.first_price + steps * rate.add_price;
 }
@@ -221,10 +223,11 @@ export function estimate(input: EstimateInput): EstimateResult {
       const rate = letterRate("printed", "air", printedGrp);
       if (rate) {
         const { total, pieces } = costProgressive(rate, w);
-        const n = [
-          "通常无追踪（可加挂号16/件）",
-          `单件上限${rate.max_weight_g / 1000}kg`,
-        ];
+        const n: string[] = [];
+        if (rate.min_billable_g) {
+          n.push(`不足${rate.min_billable_g / 1000}kg按${rate.min_billable_g / 1000}kg计 → 小批量不划算`);
+        }
+        n.push("通常无追踪（可加挂号16/件）", `单件上限${rate.max_weight_g / 1000}kg`);
         if (pieces > 1) n.push(`超限拆 ${pieces} 件，每件重付首重`);
         add("printed_air", "印刷品·航空", total, {
           feasible: true,
@@ -243,11 +246,11 @@ export function estimate(input: EstimateInput): EstimateResult {
       const rate = letterRate("printed", "surface", "flat");
       if (rate) {
         const { total, pieces } = costProgressive(rate, w);
-        const n = [
-          "水陆路，最慢但便宜",
-          "通常无追踪（可加挂号16/件）",
-          `单件上限${rate.max_weight_g / 1000}kg`,
-        ];
+        const n: string[] = [];
+        if (rate.min_billable_g) {
+          n.push(`不足${rate.min_billable_g / 1000}kg按${rate.min_billable_g / 1000}kg计 → 小批量不划算`);
+        }
+        n.push("水陆路，最慢但量大才省", "通常无追踪（可加挂号16/件）", `单件上限${rate.max_weight_g / 1000}kg`);
         if (pieces > 1) n.push(`超限拆 ${pieces} 件，每件重付首重`);
         add("printed_surface", "印刷品·水陆", total, {
           feasible: true,

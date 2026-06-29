@@ -29,6 +29,8 @@ export interface LetterRate {
   /** 航空附加费 —— 在 brackets 或累进基础上叠加（港澳台航空寄）。单位 g + 单价。 */
   air_surcharge_unit_g?: number;
   air_surcharge_price?: number;
+  /** 最低计费重量 —— 实际重量小于此值时按此值计费（国际印刷品 1kg 起算）。 */
+  min_billable_g?: number;
   /** 单件重量上限（拆件时用） */
   max_weight_g: number;
   note?: string;

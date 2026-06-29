@@ -54,6 +54,36 @@ describe("公式单元", () => {
     expect(r.first_price).toBe(610.0);
     expect(costMbag(r, 5000)).toBe(610.0);
   });
+
+  it("国际印刷品 1kg 起算 —— 不到 1kg 按 1kg 计费", () => {
+    // 印刷品·水陆·flat：min_billable_g=1000，首重 20g ¥4，续重每 10g ¥1.8
+    const r = letterRate("printed", "surface", "flat")!;
+    expect(r.min_billable_g).toBe(1000);
+    // 5g 实际重量 → 按 1000g 计：4 + ceil((1000-20)/10)*1.8 = 4 + 98*1.8 = 180.4
+    const { total: cost5g } = costProgressive(r, 5);
+    expect(cost5g).toBe(180.4);
+    // 500g → 同样按 1000g 计
+    const { total: cost500g } = costProgressive(r, 500);
+    expect(cost500g).toBe(180.4);
+    // 1500g → 实际 1500g 计费：4 + ceil(1480/10)*1.8 = 4 + 148*1.8 = 270.4
+    const { total: cost1500g } = costProgressive(r, 1500);
+    expect(cost1500g).toBe(270.4);
+  });
+
+  it("国际印刷品·航空·第一组 1kg 起算 = 220.1", () => {
+    const r = letterRate("printed", "air", "1")!;
+    expect(r.min_billable_g).toBe(1000);
+    const { total } = costProgressive(r, 5);
+    // 4.5 + 98*2.2 = 220.1
+    expect(total).toBe(220.1);
+  });
+
+  it("国际信函/M-bag/港澳台印刷品 不受 1kg min 影响（无 min_billable_g 字段）", () => {
+    expect(letterRate("letter", "surface", "jp_special")?.min_billable_g).toBeUndefined();
+    expect(letterRate("letter", "air", "1")?.min_billable_g).toBeUndefined();
+    expect(letterRate("mbag", "surface", "flat")?.min_billable_g).toBeUndefined();
+    expect(letterRate("printed", "hktw", "surface")?.min_billable_g).toBeUndefined();
+  });
 });
 
 describe("estimate 寄日本", () => {
@@ -161,5 +191,18 @@ describe("estimate 数据缺口", () => {
     const res = estimate({ destination: "俄罗斯联邦", cardCount: 100, cardWeightG: 5 });
     expect(res.options.some((o) => o.method === "printed_air")).toBe(false);
     expect(res.notes.some((n) => n.includes("印刷品航空"))).toBe(true);
+  });
+});
+
+describe("estimate 小批量国际印刷品（1kg 起算暴击）", () => {
+  it("美国 1 张(5g)：印刷品价格按 1kg 计，注解说明", () => {
+    const res = estimate({ destination: "美国", cardCount: 1, cardWeightG: 5 });
+    const printedAir = res.options.find((o) => o.method === "printed_air")!;
+    // 美国 in printed_air group 2 (¥5.0/20g + ¥2.5/10g)；按 1000g 计 = 5 + 98*2.5 = 250
+    expect(printedAir.base_cost).toBe(250.0);
+    expect(printedAir.notes.some((n) => n.includes("1kg") && n.includes("不划算"))).toBe(true);
+    // 推荐应该不是印刷品 —— 平信便宜得多
+    expect(res.recommended!.method).not.toBe("printed_air");
+    expect(res.recommended!.method).not.toBe("printed_surface");
   });
 });

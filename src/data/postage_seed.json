@@ -71,7 +71,9 @@
       "first_price": 4.5,
       "add_unit_g": 10,
       "add_price": 2.2,
-      "max_weight_g": 5000
+      "min_billable_g": 1000,
+      "max_weight_g": 5000,
+      "note": "国际印刷品 1kg 起算，不到 1kg 按 1kg 计费"
     },
     {
       "category": "printed",
@@ -81,7 +83,9 @@
       "first_price": 5.0,
       "add_unit_g": 10,
       "add_price": 2.5,
-      "max_weight_g": 5000
+      "min_billable_g": 1000,
+      "max_weight_g": 5000,
+      "note": "国际印刷品 1kg 起算"
     },
     {
       "category": "printed",
@@ -91,7 +95,9 @@
       "first_price": 6.0,
       "add_unit_g": 10,
       "add_price": 2.8,
-      "max_weight_g": 5000
+      "min_billable_g": 1000,
+      "max_weight_g": 5000,
+      "note": "国际印刷品 1kg 起算"
     },
     {
       "category": "printed",
@@ -101,8 +107,9 @@
       "first_price": 4.0,
       "add_unit_g": 10,
       "add_price": 1.8,
+      "min_billable_g": 1000,
       "max_weight_g": 5000,
-      "note": "水陆路印刷品统一价，不分组（来源：水陆路函件资费表照片）"
+      "note": "水陆路印刷品统一价（不分组），1kg 起算（不到 1kg 按 1kg）"
     },
     {
       "category": "printed",
